@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "types": ["node", "express"],
+    "target": "ES6",
+    "module": "commonjs",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "strictNullChecks": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "baseUrl": "./src",
+   "paths": {
+  "*": ["./*"]
+}
+
+  },
+  "include": ["src/**/*", "src/types/**/*.d.ts", "iview_management/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
