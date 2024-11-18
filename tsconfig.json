@@ -14,11 +14,10 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "baseUrl": "./src",
-   "paths": {
-  "*": ["./*"]
-}
-
+    "paths": {
+      "*": ["./*"]
+    }
   },
-  "include": ["src/**/*", "src/types/**/*.d.ts", "iview_management/**/*"],
+  "include": ["src/**/*", "src/types/**/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
