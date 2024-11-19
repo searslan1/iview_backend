@@ -5,6 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { IQuestion, Question } from "../../question_management/entity/question";
 import { Interview } from "../models/iview.schema";
 import { ObjectId } from "mongoose";
+import dotenv from 'dotenv';
+
+// .env dosyasını yükle
+dotenv.config();
+
+const BASE_URL = process.env.BASE_URL;
 
 export class InterviewController {
   private interviewService: InterviewService;
@@ -19,37 +25,31 @@ export class InterviewController {
     res: Response
   ): Promise<void> => {
     try {
-      const { title, packageName, status } = req.body; // 'status' frontend'den alınacak
-  
-      // packageName (tags) ile soruları buluyoruz
+      const { title, packageName, status } = req.body;
+
       const questions = await Question.find({
-        tags: { $regex: new RegExp(packageName, "i") }  // Küçük/büyük harf duyarsız arama
+        tags: { $regex: new RegExp(packageName, "i") }
       });
-  
-      // Soruların ID'lerini map'liyoruz ve türünü belirtiyoruz
+
       const questionIds: string[] = questions.map((q) => (q._id as ObjectId).toString());
-  
-      // UUID ile benzersiz bir link oluşturuyoruz
-      const interviewLink = uuidv4(); // Benzersiz link
-  
-      // Interview DTO'yu oluşturuyoruz
+
+      const interviewLink = uuidv4();
+
       const interviewDTO = new CreateInterviewDTO({
         title,
         questions: questionIds,
-        status,  // Frontend'den gelen mülakat durumu
+        status,
       });
-  
-      // Yeni mülakat nesnesini oluşturuyoruz ve link'i ekliyoruz
+
       const newInterview = {
         ...interviewDTO,
-        link: `http://localhost:5174/interview/${interviewLink}`, // Link oluşturuluyor
+        link: `${BASE_URL}/interview/${interviewLink}`,
       };
-  
-      // Servis katmanında yeni interview'u kaydediyoruz
+
       const createdInterview = await this.interviewService.createInterview(newInterview);
-  
+
       console.log("Created Interview:", createdInterview);
-  
+
       res.status(201).json(createdInterview);
     } catch (error) {
       res.status(400).json({
@@ -119,26 +119,21 @@ export class InterviewController {
 
   
   public getInterviewByUUID = async (req: Request, res: Response): Promise<void> => {
-    const { uuid } = req.params; // URL'den gelen UUID
+    const { uuid } = req.params;
     console.log("Received UUID:", uuid);
-  
+
     try {
-      // UUID'ye sahip linki buluyoruz
-      const interview = await Interview.findOne({ link: `http://localhost:5174/interview/${uuid}` })
-        .populate('questions', 'questionText duration'); // Soru metinlerini ve sürelerini alıyoruz
-  
+      const interview = await Interview.findOne({ link: `${BASE_URL}/interview/${uuid}` })
+        .populate('questions', 'questionText duration');
+
       if (!interview) {
         console.log("Interview not found");
         res.status(404).json({ message: "Interview not found" });
         return;
       }
-  
-      console.log("Found Interview:", interview);
-  
-      // `questions` alanını IQuestion[] olarak alıyoruz
+
       const populatedQuestions = interview.questions as unknown as IQuestion[];
-  
-      // Soruların text ve duration bilgilerini döndürüyoruz
+
       res.status(200).json({
         title: interview.title,
         questions: populatedQuestions.map((question: IQuestion) => ({
