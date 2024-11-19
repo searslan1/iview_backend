@@ -10,11 +10,13 @@ import candidateRoutes from "./iview_management/routes/candidate.routes";
 import videoRoutes from "./iview_management/routes/video.routes";
 
 dotenv.config(); // .env dosyasını yükle
+
+// Çevresel değişkenlerin kontrolü
 if (!process.env.PORT) {
-  console.warn("Warning: PORT environment variable is not defined.");
+  console.warn("Warning: PORT environment variable is not defined. Defaulting to 5000.");
 }
 if (!process.env.DB_URI) {
-  console.error("Error: MONGO_URI is required to connect to the database.");
+  console.error("Error: DB_URI is required to connect to the database.");
   process.exit(1); // Uygulama durdurulur
 }
 
@@ -23,39 +25,50 @@ const corsOrigins = [process.env.CORS_ORIGIN, process.env.CORS_USER].filter(
   (origin): origin is string => !!origin
 );
 
+// Proxy ayarları (Eğer proxy kullanıyorsanız)
 const app = express();
+app.set("trust proxy", 1); // Proxy katmanı varsa (örneğin, Heroku, Nginx), doğru yapılandırın
 
-// Proxy ayarlarını yapıyoruz (X-Forwarded-For başlığını düzgün şekilde almak için)
-app.set('trust proxy', 1);  // Eğer proxy katmanı varsa, burada uygun değeri seçebilirsiniz
-
+// Veritabanı bağlantısını kuruyoruz
 connectDB();
 
+// CORS Middleware
 if (corsOrigins.length === 0) {
-  console.warn("No CORS origins specified, defaulting to '*'");
+  console.warn("No CORS origins specified. Defaulting to '*'.");
 }
-
-// CORS, body parser ve diğer middleware'ler
 app.use(
   cors({
-    origin: corsOrigins.length ? corsOrigins : "*", // "*": herkese izin verir.
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
+    origin: corsOrigins.length ? corsOrigins : "*", // "*" herkes için izin verir.
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true, // Tarayıcıdan gelen isteklere izin ver
   })
 );
 
-// JSON body parser middleware'ini ekliyoruz
-app.use(express.json());  // JSON verilerini parse etmek için
+// Body parser Middleware
+app.use(express.json()); // JSON verilerini parse etmek için
 app.use(express.urlencoded({ extended: true })); // URL encoded verileri parse etmek için
 
-// Router ayarları
-app.use("/api/register", registerRoutes); // admin kaydı için
+// API Router'ları
+app.use("/api/register", registerRoutes); // Admin kaydı için
 app.use("/api/auth", commonRouter); // Auth işlemleri için
 app.use("/api/questions", questionRouter); // Soru yönetimi için
-app.use("/api/iview", iviewRoutes);
-app.use("/api/candidate", candidateRoutes);
-app.use('/api/videos', videoRoutes);
+app.use("/api/iview", iviewRoutes); // Mülakat yönetimi için
+app.use("/api/candidate", candidateRoutes); // Aday yönetimi için
+app.use("/api/videos", videoRoutes); // Video işlemleri için
 
+// 404 Not Found Middleware
+app.use((req, res, next) => {
+  res.status(404).json({ message: "API route not found" });
+});
+
+// Hata Yönetimi Middleware'i
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err);
+  res.status(500).json({ message: "Internal server error", error: err.message });
+});
+
+// Sunucuyu başlat
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Sunucu ${PORT} portunda çalışıyor`);
+  console.log(`Server is running on port ${PORT}`);
 });
