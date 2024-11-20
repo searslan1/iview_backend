@@ -23,8 +23,8 @@ if (!process.env.DB_URI) {
 
 // CORS için origin'leri belirliyoruz
 const corsOrigins = [
-  process.env.CORS_ORIGIN || "http://localhost:5173",
-  process.env.CORS_USER || "http://localhost:5174"
+  process.env.CORS_ORIGIN || "https://iview-frontend-web.vercel.app",
+  process.env.CORS_USER || "https://iview-web-olive.vercel.app"
 ].filter((origin): origin is string => !!origin);
 
 const app = express();
@@ -42,7 +42,7 @@ if (corsOrigins.length === 0) {
 
 app.use(
   cors({
-    origin: corsOrigins.length ? corsOrigins : "*", // "*" herkese izin verir.
+    origin: [process.env.CORS_ORIGIN || "https://iview-frontend-web.vercel.app", process.env.CORS_USER|| "https://iview-web-olive.vercel.app" ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Çerezleri etkinleştir
