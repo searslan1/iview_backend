@@ -48,5 +48,9 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "description": ".\r ├── README.md\r ├── package-lock.json\r ├── package.json\r ├── src\r │   ├── common\r │   │   ├── config\r │   │   │   └── config.ts\r │   │   ├── controller\r │   │   │   └── auth.controller.ts\r │   │   ├── dto\r │   │   │   └── auth.dto.ts\r │   │   ├── middleware\r │   │   │   └── auth.middleware.ts\r │   │   ├── models\r │   │   │   └── user.ts\r │   │   ├── router\r │   │   │   └── auth.routes.ts\r │   │   └── service\r │   │       └── auth.service.ts\r │   ├── question_management\r │   │   ├── controller\r │   │   │   └── question.controller.ts\r │   │   ├── dto\r │   │   │   └── question.dto.ts\r │   │   ├── entity\r │   │   │   └── question.ts\r │   │   ├── repository\r │   │   │   └── question.repository.ts\r │   │   ├── routes\r │   │   │   └── question.routes.ts\r │   │   ├── service\r │   │   │   └── question.service.ts\r │   │   └── valueObject\r │   │       ├── tag.ts\r │   │       └── time.limit.ts\r │   └── types\r │       └── express.d.ts\r └── tsconfig.json",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
